@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head> 
+  <body>
+    <canvas id="pongCanvas" width="600" height="600"></canvas>
+    <script>
+        var canvas = document.getElementById('pongCanvas');
+        var context = canvas.getContext('2d');
+      
+        //background fill
+        context.beginPath();
+        context.rect(0, 0, 600, 600);
+        context.fillStyle = '#993399';
+        context.fill();
+        
+        //paddle object constructor
+        function Paddle(x, y, width, height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        };
+        
+        //paddle render
+        Paddle.prototype.render = function(){
+            context.beginPath();
+            context.rect(this.x, this.y, this.width, this.height);
+            context.strokeStyle = 'black';
+            context.stroke();
+        };
+        
+        //player object
+        function Player() {
+            this.paddle = new Paddle(50, 300, 15, 75);
+        };
+        
+        //draw player paddle
+        Player.prototype.render = function(){
+            this.paddle.render();
+            context.fillStyle = "#3366ff";
+            context.fill();
+        };
+        
+        //computer object constructor
+        function Computer() {
+            this.paddle = new Paddle(535, 300, 15, 75);
+        };
+        
+        
+        //draw computer paddle
+        Computer.prototype.render = function(){
+            this.paddle.render();
+            context.fillStyle = "#ff0000";
+            context.fill();
+        };
+
+        
+        //ball object
+        function Ball(x, y) {
+            this.x = x;
+            this.y = y;
+            this.radius = 5;
+        };
+        
+        
+        //draw ball object
+        Ball.prototype.render = function() {
+            context.beginPath();
+            context.arc(this.x, this.y, this.radius, 2 * Math.PI, false);
+            context.fillStyle = "white";
+            context.fill();
+            context.strokeStyle = 'black';
+            context.stroke();
+        };
+        
+        //instantiated objects
+        var player = new Player();
+        var computer = new Computer();
+        var ball = new Ball(canvas.width/2, canvas.height/2);
+        
+        player.render();
+        computer.render();
+        ball.render();
+    </script>
+  </body>
+</html> 
