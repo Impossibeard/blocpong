@@ -68,7 +68,9 @@
     
         
         //computer object constructor
-        function Computer() {};
+        function Computer() {
+            this.speed = 15;
+        };
         Computer.prototype = new Paddle(535, 300, 15, 75, "#ff0000");
         
         //handles computer AI
@@ -109,9 +111,10 @@
             context.strokeStyle = 'black';
             context.stroke();
         };
+
         
         Ball.prototype.move = function(player, computer) {
-            this.x += this.x_speed;
+            this.x += this.x_speed; 
             this.y += this.y_speed;
             var player_front = player.x + player.width;
             var player_top = player.y;
@@ -124,19 +127,37 @@
             this.left = this.x - 5;
             this.right = this.x + 5;
             
+            
+        
             //hits a wall
             if (this.y <= 5 || this.y >= 600) {
                 this.y_speed *= -1;
             };
             
+            /*
+            
+                The ball is a hit on the player paddle if:
+                
+                ballX - ballRadius <= playerPaddleX + playerPaddleWidth && ballX - ballRadius >= playerPaddleX
+                &&
+                ballY >= playerPaddleY && ballY <= playerPaddleY + playerPaddleHeight
+                
+            */
+            
+            //var leftOfBall = this.x - this.radius;
+            
+            //if (leftOfBall <= player.x + player.width && this.y <= player.y + player.height && this.y >= player.y)
+            
+            
+            
             //hits the front of a player's paddle
-            if (this.left === player_front && (this.bottom < player_bottom && this.top > player_top)){
+            if (this.left <= player_front && this.left >= player.x && this.y >= player.y && this.y <= player_bottom){
                 this.x_speed *= -1;
                 this.y_speed *= -1;
             };
             
-            console.log(this.bottom);
-            console.log(computer_bottom);
+            //console.log(this.bottom);
+            //console.log(computer_bottom);
             
             //hits the front of a computer's paddle
             if (this.right === computer_front && (this.bottom < computer_bottom && this.top > computer_top)){
@@ -147,9 +168,9 @@
             var ball_reset = function(){
                 this.x = canvas.width/2;
                 this.y = canvas.height/2;
-                this.x_speed = random_x_speed;
-                this.y_speed = random_y_speed;
-            };
+                //this.x_speed = random_x_speed;
+                //this.y_speed = random_y_speed;
+            }.bind(this);
             
             //point is scored
             if(this.x > canvas.width){
