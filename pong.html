@@ -6,19 +6,37 @@
             margin: 0px;
             padding: 0px;
         }
-        .score {
-            display: inline-block;
+        div {
             border: 1px solid black;
-            width: 296px;
             text-align: center;
-            background-color: peachpuff;
+            color: white;
+            margin-bottom: 4px;
+        }
+        
+        div#playerScore {
+            display: inline-block;
+            width: 297px;
+            background-color: blue;
+        }
+        div#computerScore {
+            display: inline-block;
+            width: 297px;
+            background-color: red;
         }
         #pongCanvas {
             display:block;
+            border: 1px solid black;
+        }
+        div#gameover {
+            width: 600px;
+            background-color: silver;
+            color: black;
+            
         }
     </style>
   </head> 
   <body>
+    <div id="gameover" onclick="location.reload()" style="visibility:hidden"></div>
     <div id="computerScore" class="score">0</div>
     <div id="playerScore" class="score">0</div>
     <canvas id="pongCanvas" width="600" height="600"></canvas>
@@ -148,7 +166,7 @@
             if (this.left <= player_front && this.left >= player.x && this.bottom >= player.y && this.top <= player_bottom){
                 this.x_speed *= -1;
                 if (player.moving === true){
-                  this.x_speed = 4.5;  
+                  this.y_speed *= 1.2;  
                 } else {
                     this.x_speed = 3;
                 }
@@ -168,18 +186,38 @@
             
             //point is scored
             if(this.x > canvas.width){
-                console.log("Player scores!");
                 ball_reset();
                 playerScore += 1;
                 console.log(playerScore);
                 document.getElementById("playerScore").innerHTML = playerScore;
+                gameWin(playerScore);
             } else if(this.x < 0){
-                console.log("Computer scores!");
                 ball_reset();
                 computerScore += 1;
                 console.log(computerScore);
                 document.getElementById("computerScore").innerHTML = computerScore;
+                gameLose(computerScore);
             }
+        };
+        
+        //game over
+        var gameWin = function(playerScore){
+            if(playerScore >= 11) {
+                document.getElementById("gameover").innerHTML = "Congratulations! Click to play again!";
+                document.getElementById("gameover").style.visibility = "visible";
+                document.getElementById("gameover").style.cursor = "pointer";
+                ball.x_speed = 0;
+                ball.y_speed = 0;
+            };
+        };
+        var gameLose = function(computerScore){
+            if(computerScore >= 11) {
+                document.getElementById("gameover").innerHTML = "Better luck next time! Click to play again!";
+                document.getElementById("gameover").style.visibility = "visible";
+                document.getElementById("gameover").style.cursor = "pointer";
+                ball.x_speed = 0;
+                ball.y_speed = 0;
+            };
         };
         
         
@@ -216,13 +254,11 @@
                 player.moving = true;
             } else if (event.key === "ArrowDown"){
                 player.move(1);
-                console.log("moving down!");
                 player.moving = true;
             };
         });
         window.addEventListener("keyup", function() {
             player.moving = false;
-            console.log("staying put!");
         });
         
         
