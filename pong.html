@@ -2,13 +2,25 @@
 <html>
   <head>
     <style>
-      body {
-        margin: 0px;
-        padding: 0px;
-      }
+        body {
+            margin: 0px;
+            padding: 0px;
+        }
+        .score {
+            display: inline-block;
+            border: 1px solid black;
+            width: 296px;
+            text-align: center;
+            background-color: peachpuff;
+        }
+        #pongCanvas {
+            display:block;
+        }
     </style>
   </head> 
   <body>
+    <div id="computerScore" class="score">0</div>
+    <div id="playerScore" class="score">0</div>
     <canvas id="pongCanvas" width="600" height="600"></canvas>
     <script>
         
@@ -20,6 +32,9 @@
         function(callback) { window.setTimeout(callback, 1000/60) };
         var canvas = document.getElementById('pongCanvas');
         var context = canvas.getContext('2d');
+        //scorekeeping variables
+        var playerScore = 0;
+        var computerScore = 0;
       
         //background fill
         function Background(){};
@@ -38,7 +53,7 @@
             this.width = width;
             this.height = height;
             this.color = color;
-            this.speed = 20;
+            this.speed = 30;
         };
         
         //paddle render
@@ -59,7 +74,8 @@
                 this.y = 0;
             } else if (this.y + this.height > 600) {
                 this.y = 600 - this.height;
-            }
+            };
+            this.moving = false;
         };
         
         //player object
@@ -69,7 +85,7 @@
         
         //computer object constructor
         function Computer() {
-            this.speed = 15;
+            this.speed = 3;
         };
         Computer.prototype = new Paddle(535, 300, 15, 75, "#ff0000");
         
@@ -84,12 +100,6 @@
                 this.move(1);
             };
         };
-        
-        //speed calculations
-        var positive_x_speed = Math.floor((Math.random() * 3) + 1);
-        var positive_y_speed = Math.floor((Math.random() * 3) + 1);
-        var random_x_speed = positive_x_speed * (Math.floor(Math.random()*2) == 1 ? 1 : -1);
-        var random_y_speed = positive_y_speed * (Math.floor(Math.random()*2) == 1 ? 1 : -1);
 
         
         //ball object
@@ -97,8 +107,8 @@
             this.x = x;
             this.y = y;
             this.radius = 5;
-            this.x_speed = random_x_speed;
-            this.y_speed = random_y_speed;
+            this.x_speed = 3;
+            this.y_speed = 3;
         };
         
         
@@ -119,7 +129,7 @@
             var player_front = player.x + player.width;
             var player_top = player.y;
             var player_bottom = player.y + player.height; 
-            var computer_front = computer.x;
+            var computer_back = computer.x + computer.width;
             var computer_top = computer.y;
             var computer_bottom = computer.y + computer.height; 
             this.top = this.y - 5;
@@ -128,41 +138,25 @@
             this.right = this.x + 5;
             
             
-        
             //hits a wall
             if (this.y <= 5 || this.y >= 600) {
                 this.y_speed *= -1;
             };
             
-            /*
-            
-                The ball is a hit on the player paddle if:
-                
-                ballX - ballRadius <= playerPaddleX + playerPaddleWidth && ballX - ballRadius >= playerPaddleX
-                &&
-                ballY >= playerPaddleY && ballY <= playerPaddleY + playerPaddleHeight
-                
-            */
-            
-            //var leftOfBall = this.x - this.radius;
-            
-            //if (leftOfBall <= player.x + player.width && this.y <= player.y + player.height && this.y >= player.y)
-            
-            
             
             //hits the front of a player's paddle
-            if (this.left <= player_front && this.left >= player.x && this.y >= player.y && this.y <= player_bottom){
+            if (this.left <= player_front && this.left >= player.x && this.bottom >= player.y && this.top <= player_bottom){
                 this.x_speed *= -1;
-                this.y_speed *= -1;
+                if (player.moving === true){
+                  this.x_speed = 4.5;  
+                } else {
+                    this.x_speed = 3;
+                }
             };
             
-            //console.log(this.bottom);
-            //console.log(computer_bottom);
-            
             //hits the front of a computer's paddle
-            if (this.right === computer_front && (this.bottom < computer_bottom && this.top > computer_top)){
+            if (this.right >= computer.x && this.right <= computer_back && this.bottom >= computer.y && this.top <= computer_bottom){
                 this.x_speed *= -1;
-                this.y_speed *= -1;
             };
             
             var ball_reset = function(){
@@ -176,11 +170,18 @@
             if(this.x > canvas.width){
                 console.log("Player scores!");
                 ball_reset();
+                playerScore += 1;
+                console.log(playerScore);
+                document.getElementById("playerScore").innerHTML = playerScore;
             } else if(this.x < 0){
                 console.log("Computer scores!");
                 ball_reset();
+                computerScore += 1;
+                console.log(computerScore);
+                document.getElementById("computerScore").innerHTML = computerScore;
             }
         };
+        
         
         //instantiated objects
         var background = new Background();
@@ -209,19 +210,19 @@
         };
         
         window.addEventListener("keydown", function(event) {
-            console.log("moving! Player at " + player.x + ", " + player.y);
-            console.log(event.key);
             event.preventDefault();
             if (event.key === "ArrowUp"){
                 player.move(-1);
-                console.log("moving up!");
+                player.moving = true;
             } else if (event.key === "ArrowDown"){
                 player.move(1);
                 console.log("moving down!");
-            } else {
-                player.move(0);
-                console.log("staying put!");
-            }
+                player.moving = true;
+            };
+        });
+        window.addEventListener("keyup", function() {
+            player.moving = false;
+            console.log("staying put!");
         });
         
         

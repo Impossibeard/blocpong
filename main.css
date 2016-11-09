@@ -1,0 +1,7 @@
+.score {
+    display: inline-block;
+    border: 1px solid black;
+    width: 296px;
+    text-align: center;
+    background-color: peachpuff;
+}
